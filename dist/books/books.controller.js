@@ -21,20 +21,35 @@ let BooksController = class BooksController {
     constructor(booksService) {
         this.booksService = booksService;
     }
-    create(body) {
-        return this.booksService.create(body);
+    async create(createBookDto) {
+        return this.booksService.create(createBookDto);
     }
-    findAll() {
+    async findAll() {
         return this.booksService.findAll();
     }
-    findOne(id) {
-        return this.booksService.findOne(+id);
+    async getBookById(id) {
+        console.log(`Received request to get book with ID: ${id}`);
+        try {
+            const book = await this.booksService.findOneById(id);
+            if (!book) {
+                console.log(`Book with ID ${id} not found`);
+                throw new common_1.NotFoundException(`Book with ID ${id} not found`);
+            }
+            console.log(`Book with ID ${id} found: ${JSON.stringify(book)}`);
+            return book;
+        }
+        catch (error) {
+            console.error(`Error getting book with ID ${id}: ${error.message}`);
+            throw new common_1.InternalServerErrorException('Error getting book');
+        }
     }
-    update(id, updateBookDto) {
-        return this.booksService.update(+id, updateBookDto);
+    async update(id, updateBookDto) {
+        console.log(`Received ID: ${id}`);
+        return this.booksService.update(id, updateBookDto);
     }
-    remove(id) {
-        return this.booksService.remove(+id);
+    async remove(id) {
+        console.log(`Received ID: ${id}`);
+        return this.booksService.remove(id);
     }
 };
 exports.BooksController = BooksController;
@@ -52,29 +67,29 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BooksController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], BooksController.prototype, "findOne", null);
+    __metadata("design:returntype", Promise)
+], BooksController.prototype, "getBookById", null);
 __decorate([
-    (0, common_1.Patch)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_book_dto_1.UpdateBookDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BooksController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BooksController.prototype, "remove", null);
 exports.BooksController = BooksController = __decorate([
-    (0, common_1.Controller)("books"),
+    (0, common_1.Controller)('books'),
     __metadata("design:paramtypes", [books_service_1.BooksService])
 ], BooksController);
 //# sourceMappingURL=books.controller.js.map

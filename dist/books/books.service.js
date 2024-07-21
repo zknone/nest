@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const book_schema_1 = require("./schemas/book.schema");
+const mongodb_1 = require("mongodb");
 let BooksService = class BooksService {
     constructor(bookModel, connection) {
         this.bookModel = bookModel;
@@ -29,14 +30,30 @@ let BooksService = class BooksService {
     findAll() {
         return this.bookModel.find().exec();
     }
-    findOne(id) {
-        return this.bookModel.findById(id).exec();
+    async findOneById(id) {
+        try {
+            const objectId = new mongodb_1.ObjectId(id);
+            const book = await this.bookModel.findById(objectId).exec();
+            return book;
+        }
+        catch (error) {
+            console.error(`Error finding book with ID ${id}: ${error.message}`);
+            throw new common_1.InternalServerErrorException('Error finding book');
+        }
     }
     update(id, data) {
-        return this.bookModel.findByIdAndUpdate({ _id: id }, data, { new: true }).exec();
+        const book = this.bookModel.findByIdAndUpdate(id, data, { new: true }).exec();
+        if (!book) {
+            throw new common_1.NotFoundException('Book not found');
+        }
+        return book;
     }
     remove(id) {
-        return this.bookModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).exec();
+        const book = this.bookModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).exec();
+        if (!book) {
+            throw new common_1.NotFoundException('Book not found');
+        }
+        return book;
     }
 };
 exports.BooksService = BooksService;

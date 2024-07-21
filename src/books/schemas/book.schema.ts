@@ -5,6 +5,7 @@ export type BookDocument = Book & Document;
 
 @Schema()
 export class Book {
+    
     @Prop({required: true})
     public title: string;
 

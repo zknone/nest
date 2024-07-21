@@ -33,7 +33,7 @@ export declare class BooksService {
     constructor(bookModel: Model<BookDocument>, connection: Connection);
     create(data: CreateBookDto): Promise<BookDocument>;
     findAll(): Promise<BookDocument[]>;
-    findOne(id: number): Promise<BookDocument>;
-    update(id: number, data: UpdateBookDto): Promise<BookDocument>;
-    remove(id: number): Promise<BookDocument>;
+    findOneById(id: string): Promise<BookDocument | null>;
+    update(id: string, data: UpdateBookDto): Promise<BookDocument>;
+    remove(id: string): Promise<BookDocument>;
 }

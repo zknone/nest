@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { CreateBookDto } from "./dto/create-book.dto";
 import { UpdateBookDto } from "./dto/update-book.dto";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { Connection, Model } from "mongoose";
+import { Connection, Model, Types } from "mongoose";
 import { Book, BookDocument } from "./schemas/book.schema";
+import { ObjectId } from "mongodb";
 
 @Injectable()
 export class BooksService {
@@ -21,15 +22,30 @@ export class BooksService {
     return this.bookModel.find().exec();
   }
 
-  public findOne(id: number): Promise<BookDocument> {
-    return this.bookModel.findById(id).exec();
+  async findOneById(id: string): Promise<BookDocument | null> {
+    try {
+      const objectId = new ObjectId(id);
+      const book = await this.bookModel.findById(objectId).exec();
+      return book;
+    } catch (error) {
+      console.error(`Error finding book with ID ${id}: ${error.message}`);
+      throw new InternalServerErrorException('Error finding book');
+    }
   }
 
-  public update(id: number, data: UpdateBookDto): Promise<BookDocument> {
-    return this.bookModel.findByIdAndUpdate({_id: id}, data, { new: true }).exec();
+  public update(id: string, data: UpdateBookDto): Promise<BookDocument> {
+    const book = this.bookModel.findByIdAndUpdate(id, data, { new: true }).exec();
+    if (!book) {
+      throw new NotFoundException('Book not found');
+    }
+    return book;
   }
 
-  public remove(id: number): Promise<BookDocument> {
-    return this.bookModel.findByIdAndUpdate(id, {isDeleted: true}, {new: true}).exec();
+  public remove(id: string): Promise<BookDocument> {
+    const book = this.bookModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).exec();
+    if (!book) {
+      throw new NotFoundException('Book not found');
+    }
+    return book;
   }
 }
