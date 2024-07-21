@@ -1,44 +1,35 @@
 import { Injectable } from "@nestjs/common";
 import { CreateBookDto } from "./dto/create-book.dto";
 import { UpdateBookDto } from "./dto/update-book.dto";
-
-const data = [
-  {
-    id: 1,
-    title: "Harry Potter",
-    description: "The best book ever",
-  },
-  {
-    id: 2,
-    title: "The Lord of the Rings",
-    description: "The second best book ever",
-  },
-  {
-    id: 3,
-    title: "The Hobbit",
-    description: "The third best book ever",
-  },
-];
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Connection, Model } from "mongoose";
+import { Book, BookDocument } from "./schemas/book.schema";
 
 @Injectable()
 export class BooksService {
-  create(createBookDto: CreateBookDto) {
-    return "This action adds a new book";
+  constructor(
+    @InjectModel(Book.name) private bookModel: Model<BookDocument>,
+    @InjectConnection() private connection: Connection,
+  ) {}
+
+  public create(data: CreateBookDto): Promise<BookDocument> {
+    const book = new this.bookModel(data);
+    return book.save();
   }
 
-  findAll() {
-    return data;
+  public findAll(): Promise<BookDocument[]> {
+    return this.bookModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  public findOne(id: number): Promise<BookDocument> {
+    return this.bookModel.findById(id).exec();
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return `This action updates a #${id} book`;
+  public update(id: number, data: UpdateBookDto): Promise<BookDocument> {
+    return this.bookModel.findByIdAndUpdate({_id: id}, data, { new: true }).exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  public remove(id: number): Promise<BookDocument> {
+    return this.bookModel.findByIdAndUpdate(id, {isDeleted: true}, {new: true}).exec();
   }
 }

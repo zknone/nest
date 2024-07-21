@@ -1,13 +1,39 @@
+/// <reference types="mongoose/types/aggregate" />
+/// <reference types="mongoose/types/callback" />
+/// <reference types="mongoose/types/collection" />
+/// <reference types="mongoose/types/connection" />
+/// <reference types="mongoose/types/cursor" />
+/// <reference types="mongoose/types/document" />
+/// <reference types="mongoose/types/error" />
+/// <reference types="mongoose/types/expressions" />
+/// <reference types="mongoose/types/helpers" />
+/// <reference types="mongoose/types/middlewares" />
+/// <reference types="mongoose/types/indexes" />
+/// <reference types="mongoose/types/models" />
+/// <reference types="mongoose/types/mongooseoptions" />
+/// <reference types="mongoose/types/pipelinestage" />
+/// <reference types="mongoose/types/populate" />
+/// <reference types="mongoose/types/query" />
+/// <reference types="mongoose/types/schemaoptions" />
+/// <reference types="mongoose/types/schematypes" />
+/// <reference types="mongoose/types/session" />
+/// <reference types="mongoose/types/types" />
+/// <reference types="mongoose/types/utility" />
+/// <reference types="mongoose/types/validation" />
+/// <reference types="mongoose/types/virtuals" />
+/// <reference types="mongoose/types/inferschematype" />
+/// <reference types="mongoose/types/inferrawdoctype" />
 import { CreateBookDto } from "./dto/create-book.dto";
 import { UpdateBookDto } from "./dto/update-book.dto";
+import { Connection, Model } from "mongoose";
+import { BookDocument } from "./schemas/book.schema";
 export declare class BooksService {
-    create(createBookDto: CreateBookDto): string;
-    findAll(): {
-        id: number;
-        title: string;
-        description: string;
-    }[];
-    findOne(id: number): string;
-    update(id: number, updateBookDto: UpdateBookDto): string;
-    remove(id: number): string;
+    private bookModel;
+    private connection;
+    constructor(bookModel: Model<BookDocument>, connection: Connection);
+    create(data: CreateBookDto): Promise<BookDocument>;
+    findAll(): Promise<BookDocument[]>;
+    findOne(id: number): Promise<BookDocument>;
+    update(id: number, data: UpdateBookDto): Promise<BookDocument>;
+    remove(id: number): Promise<BookDocument>;
 }

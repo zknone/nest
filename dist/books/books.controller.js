@@ -21,8 +21,8 @@ let BooksController = class BooksController {
     constructor(booksService) {
         this.booksService = booksService;
     }
-    create(createBookDto) {
-        return this.booksService.create(createBookDto);
+    create(body) {
+        return this.booksService.create(body);
     }
     findAll() {
         return this.booksService.findAll();
@@ -43,13 +43,13 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_book_dto_1.CreateBookDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BooksController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BooksController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(":id"),
