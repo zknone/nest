@@ -5,45 +5,63 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BooksService = void 0;
 const common_1 = require("@nestjs/common");
-const data = [
-    {
-        id: 1,
-        title: "Harry Potter",
-        description: "The best book ever",
-    },
-    {
-        id: 2,
-        title: "The Lord of the Rings",
-        description: "The second best book ever",
-    },
-    {
-        id: 3,
-        title: "The Hobbit",
-        description: "The third best book ever",
-    },
-];
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const book_schema_1 = require("./schemas/book.schema");
+const mongodb_1 = require("mongodb");
 let BooksService = class BooksService {
-    create(createBookDto) {
-        return "This action adds a new book";
+    constructor(bookModel, connection) {
+        this.bookModel = bookModel;
+        this.connection = connection;
+    }
+    create(data) {
+        const book = new this.bookModel(data);
+        return book.save();
     }
     findAll() {
-        return data;
+        return this.bookModel.find().exec();
     }
-    findOne(id) {
-        return `This action returns a #${id} book`;
+    async findOneById(id) {
+        try {
+            const objectId = new mongodb_1.ObjectId(id);
+            const book = await this.bookModel.findById(objectId).exec();
+            return book;
+        }
+        catch (error) {
+            console.error(`Error finding book with ID ${id}: ${error.message}`);
+            throw new common_1.InternalServerErrorException('Error finding book');
+        }
     }
-    update(id, updateBookDto) {
-        return `This action updates a #${id} book`;
+    update(id, data) {
+        const book = this.bookModel.findByIdAndUpdate(id, data, { new: true }).exec();
+        if (!book) {
+            throw new common_1.NotFoundException('Book not found');
+        }
+        return book;
     }
     remove(id) {
-        return `This action removes a #${id} book`;
+        const book = this.bookModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).exec();
+        if (!book) {
+            throw new common_1.NotFoundException('Book not found');
+        }
+        return book;
     }
 };
 exports.BooksService = BooksService;
 exports.BooksService = BooksService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __param(0, (0, mongoose_1.InjectModel)(book_schema_1.Book.name)),
+    __param(1, (0, mongoose_1.InjectConnection)()),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Connection])
 ], BooksService);
 //# sourceMappingURL=books.service.js.map
